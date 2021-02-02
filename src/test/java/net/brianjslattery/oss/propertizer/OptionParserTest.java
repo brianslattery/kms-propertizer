@@ -1,0 +1,96 @@
+/**
+ * Copyright © 2021 Brian J Slattery <oss@brnsl.com>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the “Software”), to
+ * deal in the Software without restriction, including without limitation the
+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+ * sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
+ * 
+ */
+package net.brianjslattery.oss.propertizer;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Before;
+import org.junit.Test;
+
+/**
+ * 
+ * @author Brian J Slattery <oss@brnsl.com>
+ * 
+ * 
+ */
+public class OptionParserTest {
+	
+	private OptionParser optionParser;
+	
+	@Before
+	public void init() {
+		this.optionParser = new OptionParser();
+	}
+
+	@Test
+	public void testBasic() {
+		SplitOption so = optionParser.parse("brnsl");
+		assertEquals("brnsl", so.getRaw());;
+		assertEquals("brnsl", so.getVal());;
+		assertFalse(so.isEnv());
+		assertFalse(so.isKms());
+	}
+	
+	@Test
+	public void testEnvironment() {
+		String input = "ENV::USER";
+		SplitOption so = optionParser.parse(input);
+		assertEquals(input, so.getRaw());;
+		assertEquals("neo", so.getVal());;
+		assertTrue(so.isEnv());
+		assertFalse(so.isKms());
+	}
+
+	@Test
+	public void testKms() {
+		String input = "KMS::some-encrypted-value";
+		SplitOption so = optionParser.parse(input);
+		assertEquals(input, so.getRaw());;
+		assertEquals("some-encrypted-value [decrypt-echo]", so.getVal());;
+		assertFalse(so.isEnv());
+		assertTrue(so.isKms());
+	}
+	
+	@Test
+	public void testEnvAndKms() {
+		String input = "ENV:KMS::USER";
+		SplitOption so = optionParser.parse(input);
+		assertEquals(input, so.getRaw());;
+		assertEquals("neo [decrypt-echo]", so.getVal());;
+		assertTrue(so.isEnv());
+		assertTrue(so.isKms());
+	}
+	
+	@Test
+	public void testKmsAndEnv() {
+		String input = "ENV:KMS::USER";
+		SplitOption so = optionParser.parse(input);
+		assertEquals(input, so.getRaw());;
+		assertEquals("neo [decrypt-echo]", so.getVal());;
+		assertTrue(so.isEnv());
+		assertTrue(so.isKms());
+	}
+	
+}
