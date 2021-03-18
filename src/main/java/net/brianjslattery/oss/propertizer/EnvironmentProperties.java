@@ -61,10 +61,12 @@ public class EnvironmentProperties {
 		
 		envVars.forEach((k,v) -> {
 			
-			boolean isIiq = isIiq(k);
-			boolean isTrg = isTrg(k);
+			String key = k;
 			
-			String key = dropPrefix(k);
+			boolean isIiq = isIiq(key);
+			boolean isTrg = isTrg(key);
+			
+			if (isIiq || isTrg) key = dropPrefix(k);
 			
 			boolean isKms = isKms(key);
 			

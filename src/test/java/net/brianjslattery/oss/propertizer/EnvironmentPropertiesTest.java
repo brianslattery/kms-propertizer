@@ -156,6 +156,38 @@ public class EnvironmentPropertiesTest {
 		baseTestIiqDoubleUnderscoreChangesToPeriod(expect, envVar);
 	}
 	
+	@Test
+	public void testIfInputNotIiqOrTarg() {
+		
+		Map<String, String> m = new HashMap<>();
+		m.put("OTHER_PROP", "$value$");
+		
+		EnvironmentProperties ep = getProps(m);
+		
+		// Count Tests
+		assertNone("Target",       ep.getTargProperties());
+		assertNone("Target (KMS)", ep.getKmsTargProperties());
+		assertNone("IIQ",         ep.getIiqProperties());
+		assertNone("IIQ (KMS)",   ep.getKmsIiqProperties());
+
+	}
+	
+	@Test
+	public void testIfInputNotIiqOrTargSmallName() {
+		
+		Map<String, String> m = new HashMap<>();
+		m.put("SML", "$value$");
+		
+		EnvironmentProperties ep = getProps(m);
+		
+		// Count Tests
+		assertNone("Target",       ep.getTargProperties());
+		assertNone("Target (KMS)", ep.getKmsTargProperties());
+		assertNone("IIQ",         ep.getIiqProperties());
+		assertNone("IIQ (KMS)",   ep.getKmsIiqProperties());
+
+	}
+	
 	public void baseTestIiqDoubleUnderscoreChangesToPeriod(String expectKey, String envVar) {
 		
 		String v = "the-value!";
