@@ -43,6 +43,14 @@ public class Utilities {
 	
 	private static final String RETURN_EMPTY_PROPS = "Props file does not exist at '%s' return empty.";
 
+	private static final String TARGET_PFX = "TRG_";
+	private static final String IIQ_PFX    = "IIQ_";
+	// keep both TRG_ and IIQ_ the same length or update code
+	private static final int PFX_LEN = 4;
+	
+	private static final String KMS_SFX    = "_KMS";
+	private static final int KMS_SFX_LEN   = KMS_SFX.length();
+	
 	/**
 	 * 
 	 * @param path a Path representing the absolute path to the file
@@ -96,12 +104,39 @@ public class Utilities {
 		
 	}
 	
+	public static String dropPrefixIfPrefixed(String k) {
+		if (isIiq(k) || isTrg(k)) return dropPrefix(k);
+		return k;
+	}
+	
+	public static boolean isIiq(String k) {
+		return k.startsWith(IIQ_PFX);
+	}
+	
+	public static boolean isTrg(String k) {
+		return k.startsWith(TARGET_PFX);
+	}
+	
+	public static boolean isKms(String k) {
+		return k.endsWith(KMS_SFX);
+	}
+	
+	public static String dropPrefix(String k) {
+		return k.substring(PFX_LEN);
+	}
+	
+	public static String dropKmsSuffix(String k) {
+		int end = k.length() - KMS_SFX_LEN;
+		return k.substring(0, end);
+	}
+	
 	private static String buildComments() {
 		return new StringBuilder()
 				.append("Built On: ")
 				.append(System.getenv("HOSTNAME"))
 				.toString();
 	}
+	
 	
 	private Utilities() {
 	}

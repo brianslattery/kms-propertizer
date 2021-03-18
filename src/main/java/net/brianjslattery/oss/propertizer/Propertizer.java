@@ -35,7 +35,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import net.brianjslattery.oss.propertizer.iiq.IIQEncryptor;
-import net.brianjslattery.oss.propertizer.iiq.IIQImporter;
+import net.brianjslattery.oss.propertizer.iiq.IiqImportHandler;
 import net.brianjslattery.oss.propertizer.kms.DecryptionService;
 import net.brianjslattery.oss.propertizer.kms.DecryptionServiceFactory;
 import net.brianjslattery.oss.propertizer.utilities.Environment;
@@ -60,37 +60,16 @@ public class Propertizer {
 		Environment env = Environment.getDefault();
 		
 		PropertizerOptions opts = CliUtils.handleArgs(args);
+		System.out.println(opts);
 		
 		EnvironmentProperties eProps = EnvironmentProperties.create(env);
 		
 		System.out.println(eProps);
 		
 		if (opts.isIiqImport()) {
-			String file    = opts.getImportCommand();
-			String userVar = opts.getIiqUserVar();
-			String passVar = opts.getIiqPassVar();
-			
-			throwIfNullOrEmpty(userVar, CliUtils.IIQ_USER_VAR);
-			throwIfNullOrEmpty(passVar, CliUtils.IIQ_PASS_VAR);
-			
-			String kmsUser = eProps.getKmsIiqProperties().get(userVar);
-			String kmsPass = eProps.getKmsIiqProperties().get(passVar);
-			
-			throwIfNullOrEmpty(kmsUser, userVar);
-			throwIfNullOrEmpty(kmsPass, kmsPass);
-			
-			DecryptionService kms = DecryptionServiceFactory.getService();
-			
-			String user = kms.decrypt(kmsUser);
-			String pass = kms.decrypt(kmsPass);
-			
-			System.out.println("Calling IIQ Import now.");
-			IIQImporter.runImport(file, user, pass);
-			
-			System.out.println("==========[ KMS Propertizer > IIQ Import Complete ]==========");
+			IiqImportHandler.doHandle(eProps, opts);
 			return;
 		}
-		
 		
 		handleProperties(opts, eProps);
 		
@@ -156,12 +135,6 @@ public class Propertizer {
 		}
 	}
 	
-	private static void throwIfNullOrEmpty(String prop, String propName) {
-		if (prop == null || prop.isEmpty()) {
-			throw new IllegalArgumentException("Property [" + prop + "] cannot be null or empty.");
-		}
-	}
-
 	private Propertizer() {
 	}
 	

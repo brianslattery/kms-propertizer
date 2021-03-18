@@ -22,22 +22,32 @@
  */
 package net.brianjslattery.oss.propertizer.iiq;
 
+import net.brianjslattery.oss.propertizer.EnvironmentProperties;
+import net.brianjslattery.oss.propertizer.PropertizerOptions;
+
 /**
  * 
  * @author Brian J Slattery <oss@brnsl.com>
  * 
- * 
  */
-public class IIQImporter {
-	
-	public static void runImport(String file, IIqConsoleCredentials creds) {
-		String quotedFile = '\'' + file + '\'';
-		String args[] = new String[]{ "console", "-c", "import", quotedFile, "-u", creds.getUsername(), "-p", "<ommitted>" };
-		System.out.println("IIQImporter: Calling import with args: " + String.join(" ", args));
-		args[7] = creds.getPassword();
-		IIQCommandRunner.run(args);
-	}
+public final class IiqImportHandler {
 
-	private IIQImporter() {
+	public static void doHandle(EnvironmentProperties eProps,
+								PropertizerOptions opts) {
+		
+		String file    = opts.getImportCommand();
+		String userVar = opts.getIiqUserVar();
+		String passVar = opts.getIiqPassVar();
+		
+		IIqConsoleCredentials creds = IIqConsoleCredentials.getPair(null, userVar, passVar);
+		
+		System.out.println("Calling IIQ Import now.");
+		IIQImporter.runImport(file, creds);
+		
+		System.out.println("==========[ KMS Propertizer > IIQ Import Complete ]==========");
 	}
+		
+	private IiqImportHandler() {
+	}
+	
 }

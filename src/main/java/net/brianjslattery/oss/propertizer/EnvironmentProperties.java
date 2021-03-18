@@ -1,5 +1,11 @@
 package net.brianjslattery.oss.propertizer;
 
+import static net.brianjslattery.oss.propertizer.utilities.Utilities.dropKmsSuffix;
+import static net.brianjslattery.oss.propertizer.utilities.Utilities.dropPrefix;
+import static net.brianjslattery.oss.propertizer.utilities.Utilities.isIiq;
+import static net.brianjslattery.oss.propertizer.utilities.Utilities.isKms;
+import static net.brianjslattery.oss.propertizer.utilities.Utilities.isTrg;
+
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -20,14 +26,6 @@ import net.brianjslattery.oss.propertizer.utilities.Environment;
  */
 public class EnvironmentProperties {
 
-	private static final String TARGET_PFX = "TRG_";
-	private static final String IIQ_PFX    = "IIQ_";
-	// keep both TRG_ and IIQ_ the same length or update code
-	private static final int PFX_LEN = 4;
-	
-	private static final String KMS_SFX    = "_KMS";
-	private static final int KMS_SFX_LEN   = KMS_SFX.length();
-	
 	private static final String DOUBLE_PCT = "%%";
 	
 	private static final String USER_DIRECTORY = "user.dir";
@@ -102,27 +100,6 @@ public class EnvironmentProperties {
 	private static String buildTargetParam(String v) {
 		return DOUBLE_PCT + v + DOUBLE_PCT;
 	}
-	
-	private static boolean isIiq(String k) {
-		return k.startsWith(IIQ_PFX);
-	}
-	
-	private static boolean isTrg(String k) {
-		return k.startsWith(TARGET_PFX);
-	}
-	
-	private static boolean isKms(String k) {
-		return k.endsWith(KMS_SFX);
-	}
-	
-	private static String dropPrefix(String k) {
-		return k.substring(PFX_LEN);
-	}
-	
-	private static String dropKmsSuffix(String k) {
-		int end = k.length() - KMS_SFX_LEN;
-		return k.substring(0, end);
-	}
 
 	private static String doubleUnderscoreToPeriod(String k) {
 		return k.replace("__", ".");
@@ -183,7 +160,7 @@ public class EnvironmentProperties {
 			sb.append("  !! IIQ Properties is EMPTY !!\n");
 		} else {
 			sb.append("\n> IIQ Properties <\n");
-			iiqProperties.forEach((k,v) -> sb.append("    t* ").append(k));
+			iiqProperties.forEach((k,v) -> sb.append("\n* ").append(k));
 		}
 		
 		sb.append("\n> IIQ KMS Properties <\n");
@@ -191,7 +168,7 @@ public class EnvironmentProperties {
 			sb.append("  !! IIQ KMS Properties is EMPTY !!\n");
 		} else {
 			sb.append("\n> IIQ KMS Properties <\n");
-			kmsIiqProperties.forEach((k,v) -> sb.append("    t* ").append(k));
+			kmsIiqProperties.forEach((k,v) -> sb.append("\n* ").append(k));
 		}
 		
 		return sb.toString();

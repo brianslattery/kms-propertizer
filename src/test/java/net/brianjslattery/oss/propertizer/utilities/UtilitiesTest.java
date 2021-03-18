@@ -24,6 +24,7 @@ package net.brianjslattery.oss.propertizer.utilities;
 
 import static java.util.stream.Collectors.toSet;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -36,8 +37,6 @@ import java.nio.file.Paths;
 import java.util.Set;
 
 import org.junit.Test;
-
-import net.brianjslattery.oss.propertizer.utilities.Utilities;
 
 /**
  * 
@@ -71,6 +70,56 @@ public class UtilitiesTest {
 		Set<String> after = listBakFiles();
 		assertEquals(before.size() + 1, after.size());
 		
+	}
+	
+	@Test
+	public void testDropPrefixIfPrefixedWhenIs() {
+		assertEquals("theRest", Utilities.dropPrefixIfPrefixed("TRG_theRest"));
+	}
+	
+	@Test
+	public void testDropPrefixIfPrefixedWhenIsNot() {
+		assertEquals("IM_NOT_PREFIXED", Utilities.dropPrefixIfPrefixed("IM_NOT_PREFIXED"));
+	}
+	
+	@Test
+	public void testIsIiqWhenTrue() {
+		assertTrue(Utilities.isIiq("IIQ_BLAH"));
+	}
+	
+	@Test
+	public void testIsIiqWhenFalse() {
+		assertFalse(Utilities.isIiq("TRG_BLAH"));
+	}
+	
+	@Test
+	public void testIsTrgWhenTrue() {
+		assertTrue(Utilities.isTrg("TRG_ASDF"));
+	}
+	
+	@Test
+	public void testIsTrgWhenFalse() {
+		assertFalse(Utilities.isTrg("IIQ_isNotTrg"));
+	}
+	
+	@Test
+	public void testIsKmsWhenTrue() {
+		assertTrue(Utilities.isKms("IIQ_DSF_KMS"));
+	}
+	
+	@Test
+	public void testIsKmsWhenFalse() {
+		assertFalse(Utilities.isKms("TRG_asdfasdf_NOTKMS"));
+	}
+	
+	@Test
+	public void testDropPrefix() {
+		assertEquals("SHOULD_BE_LEFT", Utilities.dropPrefix("IIQ_SHOULD_BE_LEFT"));
+	}
+	
+	@Test
+	public void testDropKmsSuffix() {
+		assertEquals("KEEP__ME", Utilities.dropKmsSuffix("KEEP__ME_KMS"));
 	}
 	
 	private static final Set<String> listBakFiles() throws IOException {

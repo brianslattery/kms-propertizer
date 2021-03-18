@@ -77,7 +77,7 @@ public class CliUtils {
             formatter.printHelp(NAME, options);
             System.exit(1);
         }
-                
+        
         Path iiqInputPath   = getPath(cmd, IIQ_INPUT,     INPUT);
         Path iiqOutputPath  = getPath(cmd, IIQ_OUTPUT,    OUTPUT);
         Path targInputPath  = getPath(cmd, TARGET_INPUT,  null);
