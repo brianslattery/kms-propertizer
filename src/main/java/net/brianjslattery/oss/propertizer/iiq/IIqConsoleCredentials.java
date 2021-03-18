@@ -58,8 +58,8 @@ public class IIqConsoleCredentials {
 		String username = env.get(userVarName);
 		String password = env.get(passVarName);
 
-		throwIfNullOrEmpty(username, userVar);
-		throwIfNullOrEmpty(password, passVar);
+		throwIfNullOrEmpty(username, userVarName);
+		throwIfNullOrEmpty(password, passVarName);
 		
 		DecryptionService kms = DecryptionServiceFactory.getService();
 		
