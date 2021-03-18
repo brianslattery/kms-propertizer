@@ -40,6 +40,8 @@ import java.util.Properties;
  * 
  */
 public class Utilities {
+	
+	private static final String RETURN_EMPTY_PROPS = "Props file does not exist at '%s' return empty.";
 
 	/**
 	 * 
@@ -50,10 +52,17 @@ public class Utilities {
 	 */
 	public static Properties loadPropertiesFile(Path path, String type) throws IOException {
 		Properties p = new Properties();
+		
+		if (Files.notExists(path)) {
+			System.out.println(String.format(RETURN_EMPTY_PROPS, path.toAbsolutePath()));
+			return p;
+		}
+		
 		try(InputStream is = Files.newInputStream(path, StandardOpenOption.READ)) {
 			p.load(is);
 			System.out.println("Loaded " + type + " successfully at: " + path);
 		}
+		
 		return p;
 	}
 	
