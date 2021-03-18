@@ -130,7 +130,7 @@ public class Propertizer {
 			String v = e.getValue();
 			
 			// Decrypt
-			String decrypted = kms.decrypt(e.getValue());
+			String decrypted = kms.decrypt(v);
 			
 			if (NO_IIQ_ENC.contains(k)) {
 				target.put(k, decrypted);
@@ -138,7 +138,7 @@ public class Propertizer {
 				target.put(k, IIQEncryptor.encrypt(decrypted));
 			}
 			int decryptedLen = decrypted.length();
-			rpt.append("Added encrypted key '").append(e)
+			rpt.append("Added KMS encrypted key via iiq encrypt'").append(k)
 			   .append("' with value length '").append(decryptedLen).append(".\n");
 
 		}
