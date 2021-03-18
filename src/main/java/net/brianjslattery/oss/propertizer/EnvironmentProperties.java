@@ -171,12 +171,27 @@ public class EnvironmentProperties {
 			targProperties.forEach((k,v) -> sb.append("    * ").append(k));
 		}
 		
+		sb.append("\n> Target KMS Properties <\n");
+		if (kmsTargProperties.isEmpty()) {
+			sb.append("  !! KMS Target Properties is EMPTY !!\n");
+		} else {
+			kmsTargProperties.forEach((k,v) -> sb.append("    * ").append(k));
+		}
+		
 		sb.append("\n> IIQ Properties <\n");
 		if (iiqProperties.isEmpty()) {
 			sb.append("  !! IIQ Properties is EMPTY !!\n");
 		} else {
 			sb.append("\n> IIQ Properties <\n");
 			iiqProperties.forEach((k,v) -> sb.append("    t* ").append(k));
+		}
+		
+		sb.append("\n> IIQ KMS Properties <\n");
+		if (kmsIiqProperties.isEmpty()) {
+			sb.append("  !! IIQ KMS Properties is EMPTY !!\n");
+		} else {
+			sb.append("\n> IIQ KMS Properties <\n");
+			kmsIiqProperties.forEach((k,v) -> sb.append("    t* ").append(k));
 		}
 		
 		return sb.toString();

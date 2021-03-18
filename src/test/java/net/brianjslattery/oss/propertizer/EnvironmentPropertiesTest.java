@@ -29,7 +29,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.junit.Test;
 
@@ -167,8 +166,8 @@ public class EnvironmentPropertiesTest {
 		// Count Tests
 		assertNone("Target",       ep.getTargProperties());
 		assertNone("Target (KMS)", ep.getKmsTargProperties());
-		assertNone("IIQ",         ep.getIiqProperties());
-		assertNone("IIQ (KMS)",   ep.getKmsIiqProperties());
+		assertNone("IIQ",          ep.getIiqProperties());
+		assertNone("IIQ (KMS)",    ep.getKmsIiqProperties());
 
 	}
 	
@@ -183,8 +182,8 @@ public class EnvironmentPropertiesTest {
 		// Count Tests
 		assertNone("Target",       ep.getTargProperties());
 		assertNone("Target (KMS)", ep.getKmsTargProperties());
-		assertNone("IIQ",         ep.getIiqProperties());
-		assertNone("IIQ (KMS)",   ep.getKmsIiqProperties());
+		assertNone("IIQ",          ep.getIiqProperties());
+		assertNone("IIQ (KMS)",    ep.getKmsIiqProperties());
 
 	}
 	

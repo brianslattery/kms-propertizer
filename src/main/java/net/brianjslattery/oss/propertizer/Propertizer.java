@@ -84,7 +84,7 @@ public class Propertizer {
 			String user = kms.decrypt(kmsUser);
 			String pass = kms.decrypt(kmsPass);
 			
-			System.out.println("Calling IIQ Import now. na");
+			System.out.println("Calling IIQ Import now.");
 			IIQImporter.runImport(file, user, pass);
 			
 			System.out.println("==========[ KMS Propertizer > IIQ Import Complete ]==========");

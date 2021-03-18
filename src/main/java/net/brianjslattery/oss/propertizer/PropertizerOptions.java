@@ -65,7 +65,7 @@ public class PropertizerOptions {
 	 * @return the configured iiq output path; or iiq input path if none
 	 */
 	public Path getOutputPath() {
-		return outputPath != null ? outputPath : inputPath;
+		return outputPath != null ? outputPath : getInputPath();
 	}
 	
 	/**
@@ -73,7 +73,7 @@ public class PropertizerOptions {
 	 * @return the configured target output path; or target input path if none
 	 */
 	public Path getTargetOutputPath() {
-		return targetOutputPath != null ? targetOutputPath : targetInputPath;
+		return targetOutputPath != null ? targetOutputPath : getTargetInputPath();
 	}
 	
 	public boolean isIiqImport() {
@@ -94,10 +94,15 @@ public class PropertizerOptions {
 	
 	public String toString() {
 		return new StringBuilder("PropertizerOptions: ")
-				.append("inputPath=").append(inputPath)
-				.append(", targetInputPath=").append(targetInputPath)
-				.append(", outputPath=").append(outputPath)
-				.append(", targetOutputPath=").append(targetOutputPath)
+				.append("inputPath=").append(getInputPath())
+				.append(", targetInputPath=").append(getTargetInputPath())
+				.append(", outputPath=").append(getOutputPath())
+				.append(", targetOutputPath=").append(getTargetOutputPath())
+				.append(", importCommand=").append(importCommand)
+				.append(", iiqUserVar=").append(iiqUserVar)
+				.append(", iiqPassVar=").append(iiqPassVar)
+				
+				
 				.toString();
 	}
 

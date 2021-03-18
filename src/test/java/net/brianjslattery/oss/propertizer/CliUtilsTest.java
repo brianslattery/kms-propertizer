@@ -22,6 +22,10 @@
  */
 package net.brianjslattery.oss.propertizer;
 
+import static org.junit.Assert.assertEquals;
+
+import java.nio.file.Path;
+
 import org.junit.Test;
 
 /**
@@ -31,13 +35,42 @@ import org.junit.Test;
  */
 public class CliUtilsTest {
 	
+	private static final String IIQ_IN_PATH   = "iiq-in.properties";
+	private static final String TARG_IN_PATH  = "targ-in.properties";
+	private static final String IIQ_OUT_PATH  = "iiq-out.properties";
+	private static final String TARG_OUT_PATH = "targ-out.properties";
+	
 	@Test
 	public void testBasic() {
-		
 		String[] args = new String[] {};
  		CliUtils.handleArgs(args);
-		
 	}
 	
 
+	@Test
+	public void testInputParamsOnly() {
+		String[] args = new String[] { "-iiqInput",    IIQ_IN_PATH,
+									   "-targetInput", TARG_IN_PATH };
+ 		PropertizerOptions opts = CliUtils.handleArgs(args);
+		assertEquals(IIQ_IN_PATH,   opts.getInputPath().toString());
+		assertEquals(TARG_IN_PATH,  opts.getTargetInputPath().toString());
+		// Output should be same when not specified
+		assertEquals(IIQ_IN_PATH,   opts.getOutputPath().toString());
+		assertEquals(TARG_IN_PATH,  opts.getTargetOutputPath().toString());
+	}
+	
+	@Test
+	public void testInputAndOutputParams() {
+		String[] args = new String[] { "-iiqInput",     IIQ_IN_PATH,
+									   "-targetInput",  TARG_IN_PATH,
+									   "-iiqOutput",    IIQ_OUT_PATH,
+									   "-targetOutput", TARG_OUT_PATH};
+		
+ 		PropertizerOptions opts = CliUtils.handleArgs(args);
+		assertEquals(IIQ_IN_PATH,   opts.getInputPath().toString());
+		assertEquals(TARG_IN_PATH,  opts.getTargetInputPath().toString());
+		assertEquals(IIQ_OUT_PATH,  opts.getOutputPath().toString());
+		assertEquals(TARG_OUT_PATH, opts.getTargetOutputPath().toString());
+	}
+	
 }
