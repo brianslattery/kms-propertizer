@@ -90,7 +90,7 @@ public class EnvironmentProperties {
 		
 		discards.remove(USER_DIRECTORY);
 		if (!discards.isEmpty()) {
-			System.out.println("---> Discarded unknown ENV vars: " + discards);
+			System.out.println("EnvironmentProperties: Ignoring the following env vars: " + discards);
 		}
 		
 		return ep;

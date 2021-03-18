@@ -41,7 +41,7 @@ class SystemProperties implements Environment {
 	
 	@Override
 	public String get(String name) {
-		return System.getProperty(name);
+		return System.getenv(name);
 	}
 
 	@Override
