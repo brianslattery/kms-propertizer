@@ -134,6 +134,8 @@ public class Propertizer {
 			
 			if (NO_IIQ_ENC.contains(k)) {
 				target.put(k, decrypted);
+				rpt.append("Added KMS encrypted key, skip IIQ encrypt for URL or User: '").append(k)
+				   .append("' with value '").append(decrypted).append(".\n");
 			} else {
 				target.put(k, IIQEncryptor.encrypt(decrypted));
 			}
