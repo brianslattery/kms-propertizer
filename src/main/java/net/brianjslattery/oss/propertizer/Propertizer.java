@@ -22,13 +22,24 @@
  */
 package net.brianjslattery.oss.propertizer;
 
-import static net.brianjslattery.oss.propertizer.Constants.*;
+import static java.util.Arrays.asList;
+import static net.brianjslattery.oss.propertizer.Constants.DATASOURCE_URL_PROPNAME;
+import static net.brianjslattery.oss.propertizer.Constants.DATASOURCE_USER_PROPNAME;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Set;
+
+import net.brianjslattery.oss.propertizer.iiq.IIQEncryptor;
+import net.brianjslattery.oss.propertizer.iiq.IIQImporter;
+import net.brianjslattery.oss.propertizer.kms.DecryptionService;
+import net.brianjslattery.oss.propertizer.kms.DecryptionServiceFactory;
+import net.brianjslattery.oss.propertizer.utilities.Environment;
+import net.brianjslattery.oss.propertizer.utilities.Utilities;
 
 /**
  * Simple utility to handle configuring a SailPoint IIQ
@@ -40,40 +51,116 @@ import java.util.Properties;
  */
 public class Propertizer {
 	
+	private static final Set<String> NO_IIQ_ENC = new HashSet<>(asList(
+			DATASOURCE_URL_PROPNAME,
+			DATASOURCE_USER_PROPNAME));
+	
 	public static void main(String[] args) throws IOException {
-
-		PropertizerOptions cliOpts = CliUtils.handleArgs(args);
 		
-		PropertizerOptions opts = OptionsUtilities.mergeAndProcess(cliOpts);
+		Environment env = Environment.getDefault();
 		
-		Path base = Paths.get(System.getProperty("user.dir"));
+		PropertizerOptions opts = CliUtils.handleArgs(args);
 		
-		Path srcPath = opts.getInputPath();
-		Path dstPath = opts.getOutputPath();
+		EnvironmentProperties eProps = EnvironmentProperties.create(env);
 		
-		String iiqEncDbPass = IIQEncryptor.encrypt(opts.getDbPass());
-		
-		if (!srcPath.isAbsolute()) {
-			srcPath = base.resolve(srcPath);
+		if (opts.isIiqImport()) {
+			String file    = opts.getImportCommand();
+			String userVar = opts.getIiqUserVar();
+			String passVar = opts.getIiqPassVar();
+			
+			throwIfNullOrEmpty(userVar, CliUtils.IIQ_USER_VAR);
+			throwIfNullOrEmpty(passVar, CliUtils.IIQ_PASS_VAR);
+			
+			String kmsUser = eProps.getKmsIiqProperties().get(userVar);
+			String kmsPass = eProps.getKmsIiqProperties().get(passVar);
+			
+			throwIfNullOrEmpty(kmsUser, userVar);
+			throwIfNullOrEmpty(kmsPass, kmsPass);
+			
+			DecryptionService kms = DecryptionServiceFactory.getService();
+			
+			String user = kms.decrypt(kmsUser);
+			String pass = kms.decrypt(kmsPass);
+			
+			System.out.println("Calling IIQ Import now. na");
+			IIQImporter.runImport(file, user, pass);
+			
+			System.out.println("==========[ KMS Propertizer > IIQ Import Complete ]==========");
+			return;
 		}
 		
-		if (!dstPath.isAbsolute()) {
-			dstPath = base.resolve(dstPath);
-		}
 		
-		if (!Files.isRegularFile(srcPath)) {
-			throw new IllegalArgumentException("File not valid: " + srcPath);
-		}
-
-		Properties p = Utilities.loadPropertiesFile(srcPath, "IIQ");
-		p.put(DATASOURCE_USER_PROPNAME, opts.getDbUser());
-		p.put(DATASOURCE_PASS_PROPNAME, iiqEncDbPass);
-		p.put(DATASOURCE_URL_PROPNAME,  opts.getDbUrl());
-
-		Utilities.saveProperties(p, dstPath);
+		handleProperties(opts, eProps);
 		
+		System.out.println("==========[ KMS Propertizer > Properties Complete ]==========");
+		
+	}
+	
+	private static void handleProperties(PropertizerOptions opts, EnvironmentProperties eProps) throws IOException {
+		
+		DecryptionService kms = DecryptionServiceFactory.getService();
+		
+		StringBuilder rpt = new StringBuilder();
+		
+		// Compile and store iiq.properties
+		Path iiqSrcPath  = eProps.getAbsoluteDirectory(opts.getInputPath());
+		Properties completedIiqProps = Utilities.loadPropertiesFile(iiqSrcPath, "IIQ");
+		populateFromKms(eProps.getKmsIiqProperties(),  completedIiqProps, kms, rpt);
+		populateRegular(eProps.getIiqProperties(),     completedIiqProps, rpt);
+		Path iiqDstPath = eProps.getAbsoluteDirectory(opts.getOutputPath());
+		Utilities.saveProperties(completedIiqProps, iiqDstPath);
+		
+		System.out.println("Completed iiq.properties.");
+		
+		// Compile and store target.properties
+		Path targSrcPath = eProps.getAbsoluteDirectory(opts.getTargetInputPath());
+		Properties completedTrgProps = Utilities.loadPropertiesFile(targSrcPath, "Target");
+		populateFromKms(eProps.getKmsTargProperties(), completedTrgProps, kms, rpt);
+		populateRegular(eProps.getTargProperties(),    completedTrgProps, rpt);
+		Path targDstPath = eProps.getAbsoluteDirectory(opts.getOutputPath());
+		Utilities.saveProperties(completedTrgProps, targDstPath);
+		
+		System.out.println("==========[ KMS Propertizer Report ]==========");
+		System.out.println(rpt);
+	}
+	
+	private static void populateFromKms(Map<String, String> src, Properties target, DecryptionService kms, StringBuilder rpt) {
+		for (Entry<String, String> e : src.entrySet()) {
+			String k = e.getKey();
+			String v = e.getValue();
+			
+			// Decrypt
+			String decrypted = kms.decrypt(e.getValue());
+			
+			if (NO_IIQ_ENC.contains(k)) {
+				target.put(k, decrypted);
+			} else {
+				target.put(k, IIQEncryptor.encrypt(decrypted));
+			}
+			int decryptedLen = decrypted.length();
+			rpt.append("Added encrypted key '").append(e)
+			   .append("' with value length '").append(decryptedLen).append(".\n");
+
+		}
+	}
+	
+	private static void populateRegular(Map<String, String> src, Properties target, StringBuilder rpt) {
+		for (Entry<String, String> e : src.entrySet()) {
+			String k = e.getKey();
+			String v = e.getValue();
+			target.put(k, v);
+			rpt.append("Added unencrypted key '").append(k)
+			   .append("' with value '").append(v).append(".\n");
+		}
+	}
+	
+	private static void throwIfNullOrEmpty(String prop, String propName) {
+		if (prop == null || prop.isEmpty()) {
+			throw new IllegalArgumentException("Property [" + prop + "] cannot be null or empty.");
+		}
 	}
 
 	private Propertizer() {
 	}
+	
 }

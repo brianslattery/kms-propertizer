@@ -20,9 +20,10 @@
  * DEALINGS IN THE SOFTWARE.
  * 
  */
-package net.brianjslattery.oss.propertizer;
+package net.brianjslattery.oss.propertizer.iiq;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
 
 import sailpoint.launch.Launcher;
@@ -41,22 +42,38 @@ public class IIQCommandRunner {
 	public static String runCommand(String... args) {
 		
 		// Create a stream to hold the output
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		PrintStream ps = new PrintStream(baos);
-		// IMPORTANT: Save the old System.out!
-		PrintStream old = System.out;
-		// Tell Java to use your special stream
-		System.setOut(ps);
-		// Print some output: goes to your special stream
+		try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+			
+			try(PrintStream ps = new PrintStream(baos)) {
+				// IMPORTANT: Save the old System.out!
+				PrintStream old = System.out;
+				// Tell Java to use your special stream
+				System.setOut(ps);
+				// Print some output: goes to your special stream
 
+				run(args);
+				
+				// Put things back
+				System.out.flush();
+				System.setOut(old);
+
+				return baos.toString().trim();	
+			}
+
+		} catch (IOException e) {
+			throw new RuntimeException("Failed to run IIQ Command.", e);
+		}
+		
+	}
+	
+	public static void run(String... args) {
+		String cmd = args[0];
+		System.out.println("IIQCommandRunner: begin command execution for " + cmd);
+		long start = System.nanoTime();
 		Launcher.main(args);
-		
-		// Put things back
-		System.out.flush();
-		System.setOut(old);
-
-		return baos.toString().trim();
-		
+		long end = System.nanoTime();
+		long durationMillis = (end - start) / 1000;
+		System.out.println("IIQCommandRunner: end command execution for " + cmd + ". Time spent: " + durationMillis + " millis.");
 	}
 	
 	private IIQCommandRunner() {

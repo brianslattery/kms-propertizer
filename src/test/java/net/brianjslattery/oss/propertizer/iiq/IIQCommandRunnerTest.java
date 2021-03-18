@@ -20,71 +20,31 @@
  * DEALINGS IN THE SOFTWARE.
  * 
  */
-package net.brianjslattery.oss.propertizer;
+package net.brianjslattery.oss.propertizer.iiq;
 
-import static java.util.stream.Collectors.toSet;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Set;
 
 import org.junit.Test;
+
+import net.brianjslattery.oss.propertizer.iiq.IIQCommandRunner;
 
 /**
  * 
  * @author Brian J Slattery <oss@brnsl.com>
  * 
  */
-public class UtilitiesTest {
-	
-	@Test
-	public void testLoad() throws IOException {
-		String fileName = "propertizer.properties";
-		Path cwd        = Paths.get(System.getProperty("user.dir"));
-		Path propsFile  = cwd.resolve(fileName);
-		Utilities.loadPropertiesFile(propsFile, "testing");
-	}
-	
-	@Test
-	public void testBackupFile() throws IOException {
-		
-		String fileName = "propertizer.properties";
-		Path cwd        = Paths.get(System.getProperty("user.dir"));
-		Path propsFile  = cwd.resolve(fileName);
-
-		String testFileName = "test.properties";
-		Path testFile  = cwd.resolve(testFileName);
-		
-		Files.copy(propsFile, testFile);
-		
-		Set<String> before = listBakFiles();
-		Utilities.createBackupFile(testFile);
-		Set<String> after = listBakFiles();
-		assertEquals(before.size() + 1, after.size());
-		
-	}
-	
-	private static final Set<String> listBakFiles() throws IOException {
-		Path cwd = Paths.get(System.getProperty("user.dir"));
-		return Files.list(cwd)
-					.map(p -> p.getFileName().toString())
-					.filter(x -> x.endsWith(".bak"))
-					.collect(toSet());
-	}
+public class IIQCommandRunnerTest {
 	
 	@Test
 	public void testPrivateConstructor() throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-	    Constructor<Utilities> c = Utilities.class.getDeclaredConstructor();
+	    Constructor<IIQCommandRunner> c = IIQCommandRunner.class.getDeclaredConstructor();
 	    assertTrue(Modifier.isPrivate(c.getModifiers()));
 	    c.setAccessible(true);
 	    c.newInstance();
 	}
-
+	
 }

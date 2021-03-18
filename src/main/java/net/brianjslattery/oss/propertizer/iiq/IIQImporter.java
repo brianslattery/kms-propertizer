@@ -20,29 +20,23 @@
  * DEALINGS IN THE SOFTWARE.
  * 
  */
-package net.brianjslattery.oss.propertizer;
-
-import static org.junit.Assert.assertTrue;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Modifier;
-
-import org.junit.Test;
+package net.brianjslattery.oss.propertizer.iiq;
 
 /**
  * 
  * @author Brian J Slattery <oss@brnsl.com>
  * 
+ * 
  */
-public class IIQEncryptorTest {
-
-	@Test
-	public void testPrivateConstructor() throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-	    Constructor<IIQEncryptor> c = IIQEncryptor.class.getDeclaredConstructor();
-	    assertTrue(Modifier.isPrivate(c.getModifiers()));
-	    c.setAccessible(true);
-	    c.newInstance();
-	}
+public class IIQImporter {
 	
+	public static void runImport(String file, String user, String password) {
+		String args[] = new String[]{ "import", file, "-u", user, "-p", "<ommitted>" };
+		System.out.println("IIQImporter: Calling import with args: " + String.join(" ", args));
+		args[5] = password;
+		IIQCommandRunner.run("import", file, "-u", user, "-p", password);
+	}
+
+	private IIQImporter() {
+	}
 }

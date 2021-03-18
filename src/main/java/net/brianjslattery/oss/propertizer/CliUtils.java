@@ -42,21 +42,29 @@ public class CliUtils {
 	
 	public static final String NAME = "KmsPropertizer";
 	
-	private static final String INPUT       = "input";
-	private static final String OUTPUT      = "output";
-	private static final String DB_USERNAME = "dbuser";
-	private static final String DB_PASSWORD = "dbpass";
-	private static final String DB_URL      = "dburl";
+	private static final String INPUT         = "input";
+	private static final String IIQ_INPUT     = "iiqInput";
+	private static final String TARGET_INPUT  = "targetInput";
+	private static final String OUTPUT        = "output";
+	private static final String IIQ_OUTPUT    = "iiqOutput";
+	private static final String TARGET_OUTPUT = "targetOutput";
+	private static final String IIQ_IMPORT    = "import";
+	public static final String IIQ_USER_VAR   = "iiqUserVar";
+	public static final String IIQ_PASS_VAR   = "iiqPassVar";
 	
 	public static PropertizerOptions handleArgs(String[] args) {
 		
         Options options = new Options();
 
-        addOption(INPUT,       options);
-        addOption(OUTPUT,      options);
-        addOption(DB_USERNAME, options);
-        addOption(DB_PASSWORD, options);
-        addOption(DB_URL,      options);
+        options.addOption(new Option(INPUT,         true, "Input iiq.properties path"));
+        options.addOption(new Option(IIQ_INPUT,     true, "Input iiq.properties path"));
+        options.addOption(new Option(TARGET_INPUT,  true, "Input target.properties path"));
+        options.addOption(new Option(OUTPUT,        true, "Output iiq.properties path"));
+        options.addOption(new Option(IIQ_OUTPUT,    true, "Output iiq.properties path"));
+        options.addOption(new Option(TARGET_OUTPUT, true, "Ouput target.properties path"));
+        options.addOption(new Option(IIQ_IMPORT,    true, "Run IIQ import. Value is the XML file."));
+        options.addOption(new Option(IIQ_USER_VAR,  true, "Name of env var to get user from."));
+        options.addOption(new Option(IIQ_PASS_VAR,  true, "Name of env var to get pass from."));
         
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = null;
@@ -69,30 +77,36 @@ public class CliUtils {
             formatter.printHelp(NAME, options);
             System.exit(1);
         }
+                
+        Path iiqInputPath   = getPath(cmd, IIQ_INPUT,     INPUT);
+        Path iiqOutputPath  = getPath(cmd, IIQ_OUTPUT,    OUTPUT);
+        Path targInputPath  = getPath(cmd, TARGET_INPUT,  null);
+        Path targOutputPath = getPath(cmd, TARGET_OUTPUT, null);
         
-        System.out.println("The Input Path: " + cmd.getOptionValue(INPUT));
-        
-        Path inputPath = null;
-        if (cmd.hasOption(INPUT)) {
-        	inputPath = Paths.get(cmd.getOptionValue(INPUT));
-        }
-        
-        Path outputPath = null;
-        if(cmd.hasOption(OUTPUT)) {
-        	outputPath = Paths.get(cmd.getOptionValue(OUTPUT));
-        }
+        String importCmd    = getString(cmd, IIQ_IMPORT);
+        String iiqUserVar   = getString(cmd, IIQ_USER_VAR);
+        String iiqPassVar   = getString(cmd, IIQ_PASS_VAR);
 
-        String dbUser = cmd.getOptionValue(DB_USERNAME);
-        String dbPass = cmd.getOptionValue(DB_PASSWORD);
-        String dbUrl  = cmd.getOptionValue(DB_URL);
-        
-        return new PropertizerOptions(inputPath, outputPath, dbUser, dbPass, dbUrl);        
+        return new PropertizerOptions(iiqInputPath, targInputPath, iiqOutputPath, targOutputPath,
+        								importCmd, iiqUserVar, iiqPassVar);
 		
 	}
-		
-	private static void addOption(String targetOption, Options options) {
-        Option opt = new Option(targetOption, true, targetOption + " file");
-        options.addOption(opt);
+
+	private static Path getPath(CommandLine cmd, String newParam, String oldParam) {
+        if(cmd.hasOption(newParam)) {
+        	return Paths.get(cmd.getOptionValue(newParam));
+        } else if(oldParam != null && cmd.hasOption(oldParam)) {
+        	System.out.println("CLI param " + oldParam + " is deprecated. Changed to " + newParam);
+        	return Paths.get(cmd.getOptionValue(oldParam));
+        }
+        return null;
+	}
+	
+	private static String getString(CommandLine cmd, String param) {
+        if (cmd.hasOption(param)) {
+        	return cmd.getOptionValue(param);
+        }
+        return null;
 	}
 	
 	private CliUtils() {

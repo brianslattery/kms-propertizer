@@ -20,8 +20,9 @@
  * DEALINGS IN THE SOFTWARE.
  * 
  */
-package net.brianjslattery.oss.propertizer;
+package net.brianjslattery.oss.propertizer.utilities;
 
+import static java.util.stream.Collectors.toSet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -29,66 +30,60 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Set;
 
 import org.junit.Test;
 
+import net.brianjslattery.oss.propertizer.utilities.Utilities;
+
 /**
- * Note: the PROP_* vars at the top must match the values
- * in `propertizer.properties` for these tests to pass.
  * 
  * @author Brian J Slattery <oss@brnsl.com>
  * 
  */
-public class OptionsUtilitiesTest {
-	
-	public static final String PROP_FILE_USER = "test-username";
-	public static final String PROP_FILE_PASS = "test-password";
-	public static final String PROP_FILE_URL  = "test-url";
+public class UtilitiesTest {
 	
 	@Test
-	public void testWithoutCli() throws IOException {
-		
-		PropertizerOptions opts = OptionsUtilities.mergeAndProcess(null);
-
-		assertEquals(PROP_FILE_USER, opts.getDbUser());
-		assertEquals(PROP_FILE_PASS, opts.getDbPass());
-		assertEquals(PROP_FILE_URL,  opts.getDbUrl());
+	public void testLoad() throws IOException {
+		String fileName = "propertizer.properties";
+		Path cwd        = Paths.get(System.getProperty("user.dir"));
+		Path propsFile  = cwd.resolve(fileName);
+		Utilities.loadPropertiesFile(propsFile, "testing");
 	}
 	
 	@Test
-	public void testCliOverridesFile() throws IOException {
+	public void testBackupFile() throws IOException {
 		
-		String dbUser = "theDbUser!";
-		String dbPass = "theDbP@$$!";
-		String dbUrl  = "mysql://is-your-sql";
-		
-		PropertizerOptions cliOpts = new PropertizerOptions(null, null, dbUser, dbPass, dbUrl);
-		PropertizerOptions opts = OptionsUtilities.mergeAndProcess(cliOpts);
+		String fileName = "propertizer.properties";
+		Path cwd        = Paths.get(System.getProperty("user.dir"));
+		Path propsFile  = cwd.resolve(fileName);
 
-		assertEquals(dbUser, opts.getDbUser());
-		assertEquals(dbPass, opts.getDbPass());
-		assertEquals(dbUrl,  opts.getDbUrl());
+		String testFileName = "test.properties";
+		Path testFile  = cwd.resolve(testFileName);
+		
+		Files.copy(propsFile, testFile);
+		
+		Set<String> before = listBakFiles();
+		Utilities.createBackupFile(testFile);
+		Set<String> after = listBakFiles();
+		assertEquals(before.size() + 1, after.size());
 		
 	}
 	
-	@Test
-	public void testCliAndFileHybrid() throws IOException {
-		
-		String dbUser = "theDbUser!";
-		String dbPass = "theDbP@$$!";
-		
-		PropertizerOptions cliOpts = new PropertizerOptions(null, null, dbUser, dbPass, null);
-		PropertizerOptions opts = OptionsUtilities.mergeAndProcess(cliOpts);
-
-		assertEquals(dbUser,        opts.getDbUser());
-		assertEquals(dbPass,        opts.getDbPass());
-		assertEquals(PROP_FILE_URL, opts.getDbUrl());
-		
+	private static final Set<String> listBakFiles() throws IOException {
+		Path cwd = Paths.get(System.getProperty("user.dir"));
+		return Files.list(cwd)
+					.map(p -> p.getFileName().toString())
+					.filter(x -> x.endsWith(".bak"))
+					.collect(toSet());
 	}
 	
 	@Test
 	public void testPrivateConstructor() throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-	    Constructor<OptionsUtilities> c = OptionsUtilities.class.getDeclaredConstructor();
+	    Constructor<Utilities> c = Utilities.class.getDeclaredConstructor();
 	    assertTrue(Modifier.isPrivate(c.getModifiers()));
 	    c.setAccessible(true);
 	    c.newInstance();

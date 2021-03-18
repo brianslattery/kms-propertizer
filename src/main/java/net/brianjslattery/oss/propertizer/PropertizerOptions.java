@@ -32,55 +32,72 @@ import java.nio.file.Path;
 public class PropertizerOptions {
 
 	private final Path inputPath;
+	private final Path targetInputPath;
 	private final Path outputPath;
-	private final String dbUser;
-	private final String dbPass;
-	private final String dbUrl;
+	private final Path targetOutputPath;
+	private final String importCommand;
+	private final String iiqUserVar;
+	private final String iiqPassVar;
 
-	public PropertizerOptions(Path inputPath, Path outputPath,
-							  String dbUser, String dbPass, String dbUrl) {
+	public PropertizerOptions(Path inputPath,  Path targetInputPath,
+					          Path outputPath, Path targetOutputPath,
+					          String importCommand, String iiqUserVar, String iiqPassVar) {
 		super();
-		this.inputPath  = inputPath;
-		this.outputPath = outputPath;
-		this.dbUser     = dbUser;
-		this.dbPass     = dbPass;
-		this.dbUrl      = dbUrl;
+		this.inputPath        = inputPath;
+		this.targetInputPath  = targetInputPath;
+		this.outputPath       = outputPath;
+		this.targetOutputPath = targetOutputPath;
+		this.importCommand    = importCommand;
+		this.iiqUserVar       = iiqUserVar;
+		this.iiqPassVar       = iiqPassVar;
 	}
 
 	public Path getInputPath() {
 		return inputPath;
 	}
+	
+	public Path getTargetInputPath() {
+		return targetInputPath;
+	}
 
 	/**
 	 * 
-	 * @return the configured output path; or input path if none
+	 * @return the configured iiq output path; or iiq input path if none
 	 */
 	public Path getOutputPath() {
 		return outputPath != null ? outputPath : inputPath;
 	}
 	
-	public String getDbUser() {
-		return dbUser;
-	}
-
-	public String getDbPass() {
-		return dbPass;
+	/**
+	 * 
+	 * @return the configured target output path; or target input path if none
+	 */
+	public Path getTargetOutputPath() {
+		return targetOutputPath != null ? targetOutputPath : targetInputPath;
 	}
 	
-	public boolean dbPassPresent() {
-		return dbPass != null && dbPass.length() > 0;
+	public boolean isIiqImport() {
+		return getImportCommand() != null;
+	}
+	
+	public String getIiqUserVar() {
+		return iiqUserVar;
 	}
 
-	public String getDbUrl() {
-		return dbUrl;
+	public String getIiqPassVar() {
+		return iiqPassVar;
 	}
 
+	public String getImportCommand() {
+		return importCommand;
+	}
+	
 	public String toString() {
-		return new StringBuilder("PropertizerOptions: inputPath=")
-				.append(inputPath)
+		return new StringBuilder("PropertizerOptions: ")
+				.append("inputPath=").append(inputPath)
+				.append(", targetInputPath=").append(targetInputPath)
 				.append(", outputPath=").append(outputPath)
-				.append(", dbUser=").append(dbUser)
-				.append(", dbPassPresent=").append(dbPassPresent())
+				.append(", targetOutputPath=").append(targetOutputPath)
 				.toString();
 	}
 

@@ -20,29 +20,36 @@
  * DEALINGS IN THE SOFTWARE.
  * 
  */
-package net.brianjslattery.oss.propertizer;
+package net.brianjslattery.oss.propertizer.utilities;
 
-import static org.junit.Assert.assertTrue;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Modifier;
-
-import org.junit.Test;
+import java.util.Map;
 
 /**
  * 
- * @author Brian J Slattery <oss@brnsl.com>
+ * Proxy environment requests to System.
  * 
+ * @author Brian J Slattery <oss@brnsl.com>
+ *
  */
-public class IIQCommandRunnerTest {
+class SystemProperties implements Environment {
+
+	private static final Environment INS = new SystemProperties();
+
+	static Environment getInstance() {
+		return INS;
+	}
 	
-	@Test
-	public void testPrivateConstructor() throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-	    Constructor<IIQCommandRunner> c = IIQCommandRunner.class.getDeclaredConstructor();
-	    assertTrue(Modifier.isPrivate(c.getModifiers()));
-	    c.setAccessible(true);
-	    c.newInstance();
+	@Override
+	public String get(String name) {
+		return System.getProperty(name);
+	}
+
+	@Override
+	public Map<String, String> get() {
+		return System.getenv();
+	}
+
+	private SystemProperties() {
 	}
 	
 }

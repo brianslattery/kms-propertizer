@@ -20,7 +20,7 @@
  * DEALINGS IN THE SOFTWARE.
  * 
  */
-package net.brianjslattery.oss.propertizer;
+package net.brianjslattery.oss.propertizer.utilities;
 
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
