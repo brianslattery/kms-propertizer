@@ -116,7 +116,7 @@ public class Propertizer {
 		Properties completedTrgProps = Utilities.loadPropertiesFile(targSrcPath, "Target");
 		populateFromKms(eProps.getKmsTargProperties(), completedTrgProps, kms, targRpt);
 		populateRegular(eProps.getTargProperties(),    completedTrgProps, targRpt);
-		Path targDstPath = eProps.getAbsoluteDirectory(opts.getOutputPath());
+		Path targDstPath = eProps.getAbsoluteDirectory(opts.getTargetOutputPath());
 		Utilities.saveProperties(completedTrgProps, targDstPath);
 		System.out.println("==target.properties report==\n" + targRpt + "==end target.properties report==\n");
 		
