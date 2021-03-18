@@ -63,6 +63,8 @@ public class Propertizer {
 		
 		EnvironmentProperties eProps = EnvironmentProperties.create(env);
 		
+		System.out.println(eProps);
+		
 		if (opts.isIiqImport()) {
 			String file    = opts.getImportCommand();
 			String userVar = opts.getIiqUserVar();
