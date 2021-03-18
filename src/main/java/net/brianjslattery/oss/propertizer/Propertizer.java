@@ -67,7 +67,7 @@ public class Propertizer {
 		System.out.println(eProps);
 		
 		if (opts.isIiqImport()) {
-			IiqImportHandler.doHandle(eProps, opts);
+			IiqImportHandler.doHandle(opts);
 			return;
 		}
 		

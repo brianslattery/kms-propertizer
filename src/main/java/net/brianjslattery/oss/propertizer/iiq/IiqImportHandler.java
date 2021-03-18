@@ -22,8 +22,8 @@
  */
 package net.brianjslattery.oss.propertizer.iiq;
 
-import net.brianjslattery.oss.propertizer.EnvironmentProperties;
 import net.brianjslattery.oss.propertizer.PropertizerOptions;
+import net.brianjslattery.oss.propertizer.utilities.Environment;
 
 /**
  * 
@@ -32,14 +32,15 @@ import net.brianjslattery.oss.propertizer.PropertizerOptions;
  */
 public final class IiqImportHandler {
 
-	public static void doHandle(EnvironmentProperties eProps,
-								PropertizerOptions opts) {
+	public static void doHandle(PropertizerOptions opts) {
+		
+		Environment env = Environment.getDefault();
 		
 		String file    = opts.getImportCommand();
 		String userVar = opts.getIiqUserVar();
 		String passVar = opts.getIiqPassVar();
 		
-		IIqConsoleCredentials creds = IIqConsoleCredentials.getPair(null, userVar, passVar);
+		IIqConsoleCredentials creds = IIqConsoleCredentials.getPair(env, userVar, passVar);
 		
 		System.out.println("Calling IIQ Import now.");
 		IIQImporter.runImport(file, creds);
