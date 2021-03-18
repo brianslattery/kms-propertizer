@@ -100,28 +100,26 @@ public class Propertizer {
 		
 		DecryptionService kms = DecryptionServiceFactory.getService();
 		
-		StringBuilder rpt = new StringBuilder();
-		
 		// Compile and store iiq.properties
+		StringBuilder iiqRpt = new StringBuilder();
 		Path iiqSrcPath  = eProps.getAbsoluteDirectory(opts.getInputPath());
 		Properties completedIiqProps = Utilities.loadPropertiesFile(iiqSrcPath, "IIQ");
-		populateFromKms(eProps.getKmsIiqProperties(),  completedIiqProps, kms, rpt);
-		populateRegular(eProps.getIiqProperties(),     completedIiqProps, rpt);
+		populateFromKms(eProps.getKmsIiqProperties(),  completedIiqProps, kms, iiqRpt);
+		populateRegular(eProps.getIiqProperties(),     completedIiqProps, iiqRpt);
 		Path iiqDstPath = eProps.getAbsoluteDirectory(opts.getOutputPath());
 		Utilities.saveProperties(completedIiqProps, iiqDstPath);
-		
-		System.out.println("Completed iiq.properties.");
+		System.out.println("==iiq.properties report==\n" + iiqRpt + "==end iiq.properties report==\n");
 		
 		// Compile and store target.properties
+		StringBuilder targRpt = new StringBuilder();
 		Path targSrcPath = eProps.getAbsoluteDirectory(opts.getTargetInputPath());
 		Properties completedTrgProps = Utilities.loadPropertiesFile(targSrcPath, "Target");
-		populateFromKms(eProps.getKmsTargProperties(), completedTrgProps, kms, rpt);
-		populateRegular(eProps.getTargProperties(),    completedTrgProps, rpt);
+		populateFromKms(eProps.getKmsTargProperties(), completedTrgProps, kms, targRpt);
+		populateRegular(eProps.getTargProperties(),    completedTrgProps, targRpt);
 		Path targDstPath = eProps.getAbsoluteDirectory(opts.getOutputPath());
 		Utilities.saveProperties(completedTrgProps, targDstPath);
+		System.out.println("==target.properties report==\n" + targRpt + "==end target.properties report==\n");
 		
-		System.out.println("==========[ KMS Propertizer Report ]==========");
-		System.out.println(rpt);
 	}
 	
 	private static void populateFromKms(Map<String, String> src, Properties target, DecryptionService kms, StringBuilder rpt) {
@@ -134,14 +132,14 @@ public class Propertizer {
 			
 			if (NO_IIQ_ENC.contains(k)) {
 				target.put(k, decrypted);
-				rpt.append("Added KMS encrypted key, skip IIQ encrypt for URL or User: '").append(k)
-				   .append("' with value '").append(decrypted).append(".\n");
+				rpt.append("Added KMS encrypted key, skip IIQ encrypt for URL or User: key=[").append(k)
+				   .append("], value=[").append(decrypted).append("] .\n");
 			} else {
 				target.put(k, IIQEncryptor.encrypt(decrypted));
+				int decryptedLen = decrypted.length();
+				rpt.append("Added KMS encrypted key via iiq encrypt key=[").append(k)
+				   .append("], valueLength=[").append(decryptedLen).append("].\n");
 			}
-			int decryptedLen = decrypted.length();
-			rpt.append("Added KMS encrypted key via iiq encrypt'").append(k)
-			   .append("' with value length '").append(decryptedLen).append(".\n");
 
 		}
 	}
@@ -151,8 +149,8 @@ public class Propertizer {
 			String k = e.getKey();
 			String v = e.getValue();
 			target.put(k, v);
-			rpt.append("Added unencrypted key '").append(k)
-			   .append("' with value '").append(v).append(".\n");
+			rpt.append("Added unencrypted key=[").append(k)
+			   .append("], value=[").append(v).append("].\n");
 		}
 	}
 	
