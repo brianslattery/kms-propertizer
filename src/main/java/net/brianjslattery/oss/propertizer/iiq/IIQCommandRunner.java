@@ -51,7 +51,7 @@ public class IIQCommandRunner {
 				System.setOut(ps);
 				// Print some output: goes to your special stream
 
-				run(args);
+				Launcher.main(args);
 				
 				// Put things back
 				System.out.flush();
