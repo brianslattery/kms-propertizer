@@ -31,13 +31,13 @@ package net.brianjslattery.oss.propertizer.iiq;
 public class IIQImporter {
 	
 	public static void runImport(String file, IIqConsoleCredentials creds) {
-		String fileLine = "\"import '" + file + "'\""; 
-		String args[] = new String[]{ "console", "-c", fileLine, "-u", creds.getUsername(), "-p", "<ommitted>" };
+		String quotedCreds = '"' + creds.getPassword() + '"';
+		String[] args = new String[]{ "console", "-c", "import", file, "-u", creds.getUsername(), "-p", "<ommitted>" };
 		System.out.println("IIQImporter: Calling import with args: " + String.join(" ", args));
-		args[6] = creds.getPassword();
+		args[7] = quotedCreds;
 		IIQCommandRunner.run(args);
 	}
-
+	
 	private IIQImporter() {
 	}
 }
